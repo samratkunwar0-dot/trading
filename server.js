@@ -33,6 +33,35 @@ app.use('/api/employees', employeesRoutes);
 app.use('/api/payments', paymentsRoutes);
 
 
+app.get('/api/debug-db', async (req, res) => {
+    try {
+        const { getDB } = require('./db');
+        const db = await getDB();
+        const tables = await db.all("SELECT name FROM sqlite_master WHERE type='table'");
+        const tableNames = tables.map(t => t.name);
+
+        let writeTest = 'Not tested';
+        try {
+            await db.run('INSERT INTO notices (title, content, date, author) VALUES (?, ?, ?, ?)',
+                ['Debug', 'Test', '2026-03-04', 'System']);
+            const last = await db.get('SELECT id FROM notices ORDER BY id DESC LIMIT 1');
+            await db.run('DELETE FROM notices WHERE id = ?', [last.id]);
+            writeTest = 'Success';
+        } catch (e) {
+            writeTest = `Failed: ${e.message}`;
+        }
+
+        res.json({
+            status: 'Connected',
+            tables: tableNames,
+            writeTest,
+            dbPath: require('path').join(__dirname, 'database.sqlite')
+        });
+    } catch (err) {
+        res.status(500).json({ status: 'Error', message: err.message });
+    }
+});
+
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
