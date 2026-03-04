@@ -509,6 +509,7 @@
                     document.querySelectorAll('.map-overlay').forEach(el => {
                         el.style.display = 'none';
                     });
+                    refreshDashboardVisibility();
                 }
             });
 
@@ -636,6 +637,7 @@
         function toggleNewBillModal() {
             const overlay = document.getElementById('newBillOverlay');
             overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+            refreshDashboardVisibility();
         }
 
         async function submitNewBill(e) {
@@ -723,6 +725,7 @@
         function toggleNewNoticeModal() {
             const overlay = document.getElementById('newNoticeOverlay');
             overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+            refreshDashboardVisibility();
         }
 
         async function submitNewNotice(e) {
@@ -811,6 +814,7 @@
         function toggleEditEmployeeModal() {
             const overlay = document.getElementById('editEmployeeOverlay');
             overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+            refreshDashboardVisibility();
         }
 
         function openEditEmployeeModal(id, contact, status, duty) {
@@ -1040,30 +1044,67 @@
         }
 
 
+        function closeSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        }
+
+        function refreshDashboardVisibility() {
+            const overlays = document.querySelectorAll('.map-overlay');
+            const grid = document.querySelector('.grid-container');
+
+            let anyActive = false;
+            overlays.forEach(o => {
+                if (o.style.display === 'flex' || o.style.display === 'block') anyActive = true;
+            });
+
+            if (grid) {
+                grid.style.display = anyActive ? 'none' : 'grid';
+            }
+        }
+
         function toggleBills() {
+            closeSidebar();
             const overlay = document.getElementById('billsOverlay');
             overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+            refreshDashboardVisibility();
         }
         function togglePayments() {
+            closeSidebar();
             const overlay = document.getElementById('paymentsOverlay');
             overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+            refreshDashboardVisibility();
         }
         function toggleNotices() {
+            closeSidebar();
             const overlay = document.getElementById('noticesOverlay');
             overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+            refreshDashboardVisibility();
         }
         function toggleEmployees() {
+            closeSidebar();
             const overlay = document.getElementById('employeesOverlay');
             overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+            refreshDashboardVisibility();
         }
         function toggleMore() {
+            closeSidebar();
             const overlay = document.getElementById('moreOverlay');
             const isOpen = overlay.style.display !== 'none';
             overlay.style.display = isOpen ? 'none' : 'flex';
             if (!isOpen) {
-                // Reset delete button when opening
                 resetDeleteBtn();
             }
+            refreshDashboardVisibility();
+        }
+
+        function toggleITPanel() {
+            closeSidebar();
+            const overlay = document.getElementById('itPanelOverlay');
+            overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+            refreshDashboardVisibility();
         }
 
         let deleteClickCount = 0;
