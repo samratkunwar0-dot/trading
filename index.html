@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M & G Traders - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="loader-wrapper" id="loaderWrapper">
+        <div class="loader-content">
+            <h1 class="loader-title">M & G Traders</h1>
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <div class="background">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    <div class="login-container">
+        <form class="login-form" id="loginForm">
+            <h2>M & G Traders</h2>
+            <p class="subtitle">Please enter your details to sign in</p>
+
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="username" required placeholder=" " autocomplete="off">
+                <label for="username">Username</label>
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" required placeholder=" ">
+                <label for="password">Password</label>
+                <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+            </div>
+
+            <div class="options">
+                <label class="remember-me">
+                    <input type="checkbox">
+                    <span>Remember me</span>
+                </label>
+                <a href="#" class="forgot-password">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="login-btn">
+                <span>Sign In</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+
+
+
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

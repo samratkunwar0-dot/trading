@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - M & G Traders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dashboard-body">
+
+    <div class="background dashboard-bg">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="dashboard-container">
+
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>M & G</h2>
+                <p>Traders</p>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#" onclick="toggleBills()"><i class="fas fa-file-invoice-dollar"></i> Bills & Invoices</a>
+                </li>
+                <li><a href="#" onclick="togglePayments()"><i class="fas fa-credit-card"></i> Payments</a></li>
+                <li><a href="#" onclick="toggleEmployees()"><i class="fas fa-users"></i> Employees
+                        DB</a></li>
+                <li><a href="#" onclick="toggleNotices()"><i class="fas fa-bell"></i> Notices</a></li>
+                <li><a href="#" class="admin-only" onclick="toggleMore()"><i class="fas fa-ellipsis-h"></i> More</a>
+                </li>
+                <li><a href="#" class="superadmin-only" onclick="toggleITPanel()"><i class="fas fa-shield-alt"></i> IT
+                        Panel</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="index.html" class="logout-btn"
+                    onclick="localStorage.removeItem('isAdmin');localStorage.removeItem('isSuperAdmin');localStorage.removeItem('username');localStorage.removeItem('displayName');localStorage.removeItem('role');"><i
+                        class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </nav>
+
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="mobile-toggle" id="mobileToggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="welcome-text">
+                    <h1>Welcome back, <span class="highlight" id="userDisplayName">User</span></h1>
+                    <p>Here's what's happening at M &amp; G Traders today.</p>
+                </div>
+                <div class="header-center">
+                    <div class="live-clock" id="liveClock"></div>
+                    <div class="live-date" id="liveDate"></div>
+                </div>
+                <div class="user-profile">
+                    <div class="notification-bell">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    <img src="https://ui-avatars.com/api/?name=User&background=23a2f6&color=fff" id="userAvatar"
+                        alt="Profile" class="avatar">
+                </div>
+            </header>
+
+
+            <div class="grid-container">
+
+                <div class="card summary-card fade-in" style="animation-delay: 0.1s;">
+                    <div class="card-icon"><i class="fas fa-wallet"></i></div>
+                    <div class="card-info">
+                        <h3>Total Balance</h3>
+                        <h2 id="totalBalanceEl">Rs. 0</h2>
+                        <span class="positive admin-only"
+                            style="cursor: pointer; padding: 5px; background: rgba(220,53,69,0.2); color: #dc3545; border-radius: 5px; margin-top: 10px; display: inline-block;"
+                            onclick="resetFunds()"><i class="fas fa-undo"></i> Reset Funds</span>
+                    </div>
+                </div>
+
+                <div class="card summary-card fade-in" style="animation-delay: 0.2s;">
+                    <div class="card-icon"><i class="fas fa-file-invoice"></i></div>
+                    <div class="card-info">
+                        <h3>Pending Bills</h3>
+                        <h2>14</h2>
+                        <span class="negative"><i class="fas fa-arrow-down"></i> 3 overdue</span>
+                    </div>
+                </div>
+
+                <div class="card summary-card fade-in" style="animation-delay: 0.3s;" onclick="toggleEmployees()"
+                    style="cursor: pointer;">
+                    <div class="card-icon"><i class="fas fa-users"></i></div>
+                    <div class="card-info">
+                        <h3>Active Employees</h3>
+                        <h2 id="activeEmployeesCount">0</h2>
+                        <span class="neutral" id="activeEmployeesText">Loading...</span>
+                    </div>
+                </div>
+
+
+                <div class="quick-actions fade-in" style="animation-delay: 0.4s;">
+                    <h3>Quick Actions</h3>
+                    <div class="actions-grid">
+                        <button class="action-btn" onclick="toggleNewBillModal()"><i class="fas fa-plus"></i> New
+                            Bill</button>
+                        <button class="action-btn" onclick="showToast('Opening payment form...', 'info')"><i
+                                class="fas fa-money-check-alt"></i> Make Payment</button>
+                        <button class="action-btn admin-only" onclick="toggleNewNoticeModal()"><i
+                                class="fas fa-bullhorn"></i> Post Notice</button>
+                    </div>
+                </div>
+
+
+                <div class="recent-activity fade-in" style="animation-delay: 0.5s;">
+                    <h3>Recent Notices</h3>
+                    <ul class="activity-list" id="recentNoticesList">
+                        <li>
+                            <p style="color:#aaa;">Loading notices...</p>
+                        </li>
+                    </ul>
+                </div>
+
+
+
+                <div class="map-overlay" id="billsOverlay" style="display: none;">
+                    <div class="map-header">
+                        <h3><i class="fas fa-file-invoice-dollar"></i> Recent Bills & Invoices</h3>
+                        <button class="close-map-btn" onclick="toggleBills()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="bills-container">
+                        <table class="bills-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Client / Vendor</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="billsTableBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: #aaa;">Loading bills...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+                <div class="map-overlay" id="paymentsOverlay" style="display: none;">
+                    <div class="map-header">
+                        <h3><i class="fas fa-credit-card"></i> Payments & Transfers</h3>
+                        <button class="close-map-btn" onclick="togglePayments()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="payments-container bills-container">
+                        <div class="payments-split">
+                            <div class="recent-transactions">
+                                <h4>Recent Transactions</h4>
+                                <ul class="activity-list" style="margin-top: 15px;" id="paymentsListContainer">
+                                    <li>
+                                        <p style="color:#aaa;">Loading payments...</p>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="quick-transfer">
+                                <h4>Quick Transfer</h4>
+                                <form class="transfer-form" id="quickTransferForm"
+                                    onsubmit="submitQuickTransfer(event)">
+                                    <div class="input-group" style="margin-bottom: 15px; margin-top: 15px;">
+                                        <input type="text" id="transferRecipient" required placeholder=" "
+                                            autocomplete="off" style="padding: 10px 15px;">
+                                        <label style="left: 15px;">Recipient Account / Name</label>
+                                    </div>
+                                    <div class="input-group" style="margin-bottom: 25px;">
+                                        <input type="number" id="transferAmount" step="0.01" required placeholder=" "
+                                            autocomplete="off" style="padding: 10px 15px;">
+                                        <label style="left: 15px;">Amount (Rs.)</label>
+                                    </div>
+                                    <button class="action-btn" type="submit"
+                                        style="width:100%; justify-content:center; background:#23a2f6; color:#fff; border:none; font-weight:600;">
+                                        <i class="fas fa-paper-plane" style="color:#fff;"></i> Send Payment
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="map-overlay" id="noticesOverlay" style="display: none;">
+                    <div class="map-header">
+                        <h3><i class="fas fa-bell"></i> Official Notices</h3>
+                        <button class="close-map-btn" onclick="toggleNotices()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="bills-container notices-grid" id="allNoticesGrid">
+                        <p style="color:#aaa;">Loading notices...</p>
+                    </div>
+                </div>
+
+
+                <div class="map-overlay" id="employeesOverlay" style="display: none;">
+                    <div class="map-header">
+                        <h3><i class="fas fa-users"></i> Employee Database</h3>
+                        <div style="display: flex; gap: 15px;">
+                            <button class="close-map-btn" onclick="toggleEmployees()"><i
+                                    class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="bills-container">
+                        <table class="bills-table">
+                            <thead>
+                                <tr>
+                                    <th>Employee Name</th>
+                                    <th>Role / Title</th>
+                                    <th>Contact</th>
+                                    <th>Status</th>
+                                    <th>Current Duty/Task</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employeesTableBody">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: #aaa;">Loading employees...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+                <div class="map-overlay admin-only" id="moreOverlay" style="display: none;">
+                    <div class="map-header">
+                        <h3><i class="fas fa-cogs"></i> System Settings & More</h3>
+                        <button class="close-map-btn" onclick="toggleMore()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="bills-container">
+                        <div class="payments-split">
+                            <div class="recent-transactions">
+                                <h4>Company Profile</h4>
+                                <form class="transfer-form" style="margin-top:20px;">
+                                    <div class="input-group" style="margin-bottom: 20px;">
+                                        <input type="text" value="M & G Traders" placeholder=" " autocomplete="off"
+                                            style="padding: 10px 15px;">
+                                        <label style="left: 15px; top: -10px; background: rgba(8, 7, 16, 0.9);">Company
+                                            Name</label>
+                                    </div>
+                                    <div class="input-group" style="margin-bottom: 20px;">
+                                        <input type="text" value="Kathmandu, Nepal" placeholder=" " autocomplete="off"
+                                            style="padding: 10px 15px;">
+                                        <label style="left: 15px; top: -10px; background: rgba(8, 7, 16, 0.9);">Main
+                                            Office Address</label>
+                                    </div>
+                                    <div class="input-group" style="margin-bottom: 20px;">
+                                        <input type="email" value="contact@mgtraders.com" placeholder=" "
+                                            autocomplete="off" style="padding: 10px 15px;">
+                                        <label style="left: 15px; top: -10px; background: rgba(8, 7, 16, 0.9);">Admin
+                                            Email</label>
+                                    </div>
+                                    <button class="action-btn" type="button"
+                                        style="background:#28a745; color:#fff; border:none;">
+                                        <i class="fas fa-save" style="color:#fff;"></i> Save Changes
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="quick-transfer">
+                                <h4>System Preferences</h4>
+                                <ul class="activity-list" style="margin-top: 15px;">
+                                    <li
+                                        style="justify-content: space-between; align-items: center; border-bottom: none;">
+                                        <div class="activity-details">
+                                            <h4 style="color:#fff;">Two-Factor Authentication</h4>
+                                            <p>Require 2FA for all admin logins.</p>
+                                        </div>
+                                        <label class="remember-me">
+                                            <input type="checkbox" checked>
+                                        </label>
+                                    </li>
+                                    <li
+                                        style="justify-content: space-between; align-items: center; border-bottom: none;">
+                                        <div class="activity-details">
+                                            <h4 style="color:#fff;">Email Notifications</h4>
+                                            <p>Receive daily summary reports.</p>
+                                        </div>
+                                        <label class="remember-me">
+                                            <input type="checkbox" checked>
+                                        </label>
+                                    </li>
+                                    <li
+                                        style="justify-content: space-between; align-items: center; border-bottom: none;">
+                                        <div class="activity-details">
+                                            <h4 style="color:#fff;">Dark Mode Dashboard</h4>
+                                            <p>Use the sleek dark theme.</p>
+                                        </div>
+                                        <label class="remember-me">
+                                            <input type="checkbox" checked disabled>
+                                        </label>
+                                    </li>
+                                </ul>
+                                <div class="danger-zone"
+                                    style="margin-top: 30px; padding: 20px; border: 1px dashed #dc3545; border-radius: 12px; background: rgba(220, 53, 69, 0.05);">
+                                    <h4 style="color: #dc3545; margin-bottom: 5px;"><i
+                                            class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
+                                    <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Deleting your account
+                                        is permanent and cannot be undone.</p>
+                                    <button id="tripleDeleteBtn" class="action-btn"
+                                        style="width: 100%; justify-content: center; background: #dc354522; color: #dc3545; border: 1px solid #dc3545; font-weight: 600; transition: all 0.3s ease;"
+                                        onclick="handleTripleDelete()">
+                                        <i class="fas fa-user-slash" style="color: #dc3545;"></i> Delete My Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+                <div class="map-overlay" id="newBillOverlay"
+                    style="display: none; align-items: center; justify-content: center;">
+                    <div
+                        style="background: rgba(8, 7, 22, 0.95); padding: 30px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); width: 400px; max-width: 90%;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="color: #fff;"><i class="fas fa-plus-circle"></i> Create New Bill</h3>
+                            <button class="close-map-btn" onclick="toggleNewBillModal()" style="position: static;"><i
+                                    class="fas fa-times"></i></button>
+                        </div>
+                        <form id="newBillForm" onsubmit="submitNewBill(event)">
+                            <div class="input-group" style="margin-bottom: 20px;">
+                                <input type="text" id="billClientName" required placeholder=" "
+                                    style="padding: 10px 15px;">
+                                <label style="left: 15px; top: -10px; background: #080716;">Client Name</label>
+                            </div>
+                            <div class="input-group" style="margin-bottom: 20px;">
+                                <input type="date" id="billDate" required
+                                    style="padding: 10px 15px; color-scheme: dark;">
+                                <label style="left: 15px; top: -10px; background: #080716;">Date</label>
+                            </div>
+                            <div class="input-group" style="margin-bottom: 20px;">
+                                <input type="number" step="0.01" id="billAmount" required placeholder=" "
+                                    style="padding: 10px 15px;">
+                                <label style="left: 15px; top: -10px; background: #080716;">Amount (Rs.)</label>
+                            </div>
+                            <div class="input-group" style="margin-bottom: 20px;">
+                                <select id="billStatus" required
+                                    style="padding: 10px 15px; width: 100%; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 8px;">
+                                    <option value="Pending" style="background:#080716;">Pending</option>
+                                    <option value="Paid" style="background:#080716;">Paid</option>
+                                </select>
+                                <label style="left: 15px; top: -10px; background: #080716;">Status</label>
+                            </div>
+                            <button class="action-btn" type="submit"
+                                style="width: 100%; justify-content: center; background: #23a2f6; color: #fff; border: none;">Save
+                                Bill</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="map-overlay admin-only" id="newNoticeOverlay"
+                    style="display: none; align-items: center; justify-content: center;">
+                    <div
+                        style="background: rgba(8, 7, 22, 0.95); padding: 30px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); width: 400px; max-width: 90%;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="color: #fff;"><i class="fas fa-bullhorn"></i> Post Notice</h3>
+                            <button class="close-map-btn" onclick="toggleNewNoticeModal()" style="position: static;"><i
+                                    class="fas fa-times"></i></button>
+                        </div>
+                        <form id="newNoticeForm" onsubmit="submitNewNotice(event)">
+                            <div class="input-group" style="margin-bottom: 20px;">
+                                <input type="text" id="noticeTitle" required placeholder=" "
+                                    style="padding: 10px 15px;">
+                                <label style="left: 15px; top: -10px; background: #080716;">Notice Title</label>
+                            </div>
+                            <div class="input-group" style="margin-bottom: 20px;">
+                                <textarea id="noticeContent" required placeholder=" "
+                                    style="padding: 10px 15px; width: 100%; height: 100px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 8px; font-family: inherit; resize: none;"></textarea>
+                                <label style="left: 15px; top: -10px; background: #080716;">Content</label>
+                            </div>
+                            <button class="action-btn" type="submit"
+                                style="width: 100%; justify-content: center; background: #f09819; color: #fff; border: none;">Post
+                                Notice</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="map-overlay" id="editEmployeeOverlay"
+                    style="display: none; align-items: center; justify-content: center;">
+                    <div
+                        style="background: rgba(8, 7, 22, 0.95); padding: 30px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); width: 400px; max-width: 90%;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="color: #fff;"><i class="fas fa-user-edit"></i> Edit Tasks/Details</h3>
+                            <button class="close-map-btn" onclick="toggleEditEmployeeModal()"
+                                style="position: static;"><i class="fas fa-times"></i></button>
+                        </div>
+                        <form id="editEmployeeForm" onsubmit="submitEditEmployee(event)">
+                            <input type="hidden" id="editEmpId">
+                            <div class="input-group" style="margin-bottom: 20px;">
+                                <input type="text" id="editEmpContact" required placeholder=" "
+                                    style="padding: 10px 15px;">
+                                <label style="left: 15px; top: -10px; background: #080716;">Contact Info</label>
+                            </div>
+                            <div class="input-group" style="margin-bottom: 20px;">
+                                <input type="text" id="editEmpStatus" required placeholder=" "
+                                    style="padding: 10px 15px;">
+                                <label style="left: 15px; top: -10px; background: #080716;">Status (e.g., Active - In
+                                    Office)</label>
+                            </div>
+                            <div class="input-group" style="margin-bottom: 20px;">
+                                <textarea id="editEmpDuty" required placeholder=" "
+                                    style="padding: 10px 15px; width: 100%; min-height: 100px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; resize: vertical;"></textarea>
+                                <label style="left: 15px; top: -10px; background: #080716;">Current Duty/Task
+                                    (Detailed)</label>
+                            </div>
+                            <button class="action-btn" type="submit"
+                                style="width: 100%; justify-content: center; background: #28a745; color: #fff; border: none;">Save
+                                Changes</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="map-overlay superadmin-only" id="itPanelOverlay" style="display:none;">
+                    <div class="map-header">
+                        <h3><i class="fas fa-shield-alt"></i> IT Admin Panel — Account Management</h3>
+                        <button class="close-map-btn" onclick="toggleITPanel()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="bills-container">
+                        <p style="color:#aaa;font-size:13px;margin-bottom:20px;">As IT Admin, you can update any
+                            account's password. Changes are saved immediately.</p>
+                        <div id="itAccountsList" style="display:flex;flex-direction:column;gap:15px;"></div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+
+    <div id="toastContainer"
+        style="position:fixed;bottom:30px;right:30px;z-index:9999;display:flex;flex-direction:column;gap:10px;"></div>
+
+    <script>
+        const API_BASE = '/api';
+
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+
+            try {
+                const res = await fetch(`${API_BASE}/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Invalid session');
+
+                const user = await res.json();
+
+                localStorage.setItem('displayName', user.displayName);
+                localStorage.setItem('isAdmin', user.isAdmin ? 'true' : 'false');
+                localStorage.setItem('isSuperAdmin', user.isSuperAdmin ? 'true' : 'false');
+
+
+                document.getElementById('userDisplayName').textContent = user.displayName;
+                document.getElementById('userAvatar').src = `https://ui-avatars.com/api/?name=${user.displayName}&background=23a2f6&color=fff`;
+
+                if (!user.isAdmin) {
+                    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+                }
+                if (!user.isSuperAdmin) {
+                    document.querySelectorAll('.superadmin-only').forEach(el => el.style.display = 'none');
+                }
+
+            } catch {
+
+                localStorage.clear();
+                window.location.href = 'index.html';
+                return;
+            }
+
+
+            function updateClock() {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+                const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                const clockEl = document.getElementById('liveClock');
+                const dateEl = document.getElementById('liveDate');
+                if (clockEl) clockEl.textContent = timeStr;
+                if (dateEl) dateEl.textContent = dateStr;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.map-overlay').forEach(el => {
+                        el.style.display = 'none';
+                    });
+                }
+            });
+
+            // Initial Data Fetch
+            fetchFunds();
+            fetchBills();
+            fetchNotices();
+            fetchEmployees();
+            fetchPayments();
+        });
+
+        // ================= NEW API INTEGRATION =================
+        async function fetchFunds() {
+            try {
+                const res = await fetch(`${API_BASE}/funds`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('totalBalanceEl').textContent = `Rs. ${data.money_earned.toLocaleString()}`;
+                }
+            } catch (err) {
+                console.error("Failed to fetch funds:", err);
+            }
+        }
+
+        async function resetFunds() {
+            if (!confirm("Are you sure you want to reset the company funds to zero?")) return;
+            try {
+                const res = await fetch(`${API_BASE}/funds/reset`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    showToast('Funds reset to zero.', 'success');
+                    fetchFunds();
+                } else {
+                    showToast('Failed to reset funds.', 'error');
+                }
+            } catch (err) {
+                console.error("Failed to reset funds:", err);
+            }
+        }
+
+        async function fetchBills() {
+            try {
+                const res = await fetch(`${API_BASE}/bills`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    const bills = await res.json();
+                    const tbody = document.getElementById('billsTableBody');
+                    if (bills.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No bills found.</td></tr>';
+                        return;
+                    }
+                    // Check role for delete permission
+                    const token = localStorage.getItem('token');
+                    const payload = token ? JSON.parse(atob(token.split('.')[1])) : {};
+                    const isAdmin = payload.role === 'admin' || payload.role === 'superadmin';
+
+                    tbody.innerHTML = bills.map(b => `
+                        <tr>
+                            <td>INV-${2000 + b.id}</td>
+                            <td>${b.clientName}</td>
+                            <td>${b.date}</td>
+                            <td>Rs. ${b.amount.toLocaleString()}</td>
+                            <td>
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <span class="status-badge status-${b.status.toLowerCase()}" style="cursor:pointer;" onclick="toggleBillStatus(${b.id}, '${b.status}')">
+                                        ${b.status}
+                                    </span>
+                                    ${isAdmin ? `<i class="fas fa-trash" style="color:#666; cursor:pointer; font-size:12px;" onclick="deleteBill(${b.id})"></i>` : ''}
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error("Failed to fetch bills:", err);
+            }
+        }
+
+        async function toggleBillStatus(id, currentStatus) {
+            const newStatus = currentStatus === 'Paid' ? 'Pending' : 'Paid';
+            try {
+                const res = await fetch(`${API_BASE}/bills/${id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (res.ok) {
+                    showToast(`Bill marked as ${newStatus}`, 'success');
+                    fetchBills();
+                    fetchFunds(); // Money earned might have changed
+                }
+            } catch (err) {
+                console.error("Failed to update bill status:", err);
+            }
+        }
+
+        async function deleteBill(id) {
+            if (!confirm('Are you sure you want to delete this bill? This will also adjust company funds if the bill was paid.')) return;
+            try {
+                const res = await fetch(`${API_BASE}/bills/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    showToast('Bill deleted successfully.', 'success');
+                    fetchBills();
+                    fetchFunds();
+                } else {
+                    const data = await res.json();
+                    showToast(data.error || 'Failed to delete bill.', 'error');
+                }
+            } catch (err) {
+                console.error("Delete bill error:", err);
+            }
+        }
+
+        function toggleNewBillModal() {
+            const overlay = document.getElementById('newBillOverlay');
+            overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        async function submitNewBill(e) {
+            e.preventDefault();
+            const clientName = document.getElementById('billClientName').value;
+            const date = document.getElementById('billDate').value;
+            const amount = parseFloat(document.getElementById('billAmount').value);
+            const status = document.getElementById('billStatus').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/bills`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ clientName, date, amount, status })
+                });
+                if (res.ok) {
+                    showToast('Bill created successfully!', 'success');
+                    toggleNewBillModal();
+                    document.getElementById('newBillForm').reset();
+                    fetchBills();
+                    fetchFunds();
+                } else {
+                    showToast('Failed to create bill.', 'error');
+                }
+            } catch (err) {
+                console.error("Bill creation error:", err);
+            }
+        }
+
+        async function fetchNotices() {
+            try {
+                const res = await fetch(`${API_BASE}/notices`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                const listEl = document.getElementById('recentNoticesList');
+                const gridEl = document.getElementById('allNoticesGrid');
+
+                if (res.status === 403) {
+                    listEl.innerHTML = '<li><p style="color:#aaa;">You do not have permission to view notices.</p></li>';
+                    gridEl.innerHTML = '<p style="color:#aaa;">You do not have permission to view notices.</p>';
+                    return;
+                }
+
+                if (res.ok) {
+                    const notices = await res.json();
+
+                    if (notices.length === 0) {
+                        const emptyHtml = '<p style="color:#aaa;">No recent notices.</p>';
+                        listEl.innerHTML = `<li>${emptyHtml}</li>`;
+                        gridEl.innerHTML = emptyHtml;
+                        return;
+                    }
+
+                    // Populate Activity List (max 3)
+                    listEl.innerHTML = notices.slice(0, 3).map(n => `
+                        <li>
+                            <div class="activity-icon info"><i class="fas fa-bullhorn"></i></div>
+                            <div class="activity-details">
+                                <h4>${n.title}</h4>
+                                <p>${n.content.length > 50 ? n.content.substring(0, 50) + '...' : n.content}</p>
+                                <span class="time">${n.date} &bull; ${n.author}</span>
+                            </div>
+                        </li>
+                    `).join('');
+
+                    // Populate Grid
+                    gridEl.innerHTML = notices.map(n => `
+                        <div class="notice-card info-notice">
+                            <span class="notice-date">${n.date}</span>
+                            <h4><i class="fas fa-info-circle"></i> ${n.title}</h4>
+                            <p>${n.content}</p>
+                            <span class="notice-author">By: ${n.author}</span>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error("Failed to fetch notices:", err);
+            }
+        }
+
+        function toggleNewNoticeModal() {
+            const overlay = document.getElementById('newNoticeOverlay');
+            overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        async function submitNewNotice(e) {
+            e.preventDefault();
+            const title = document.getElementById('noticeTitle').value;
+            const content = document.getElementById('noticeContent').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/notices`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ title, content })
+                });
+
+                if (res.ok) {
+                    showToast('Notice posted successfully!', 'success');
+                    toggleNewNoticeModal();
+                    document.getElementById('newNoticeForm').reset();
+                    fetchNotices();
+                } else {
+                    const data = await res.json();
+                    showToast(data.error || 'Failed to post notice.', 'error');
+                }
+            } catch (err) {
+                console.error("Notice creation error:", err);
+            }
+        }
+
+        // ================= EMPLOYEES DB LOGIC =================
+        async function fetchEmployees() {
+            try {
+                const res = await fetch(`${API_BASE}/employees`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    const employees = await res.json();
+
+                    // Update header count
+                    const activeCount = employees.filter(e => e.status.toLowerCase().includes('active')).length;
+                    document.getElementById('activeEmployeesCount').textContent = activeCount;
+                    document.getElementById('activeEmployeesText').textContent = `${activeCount} out of ${employees.length} active`;
+
+                    const tbody = document.getElementById('employeesTableBody');
+                    if (employees.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No employees found.</td></tr>';
+                        return;
+                    }
+
+                    // Decode current user role to determine edit permissions
+                    const token = localStorage.getItem('token');
+                    if (!token) return;
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    const userRole = payload.role;
+                    const displayName = payload.displayName;
+
+                    tbody.innerHTML = employees.map(e => {
+                        let statusClass = 'status-paid';
+                        if (e.status.toLowerCase().includes('leave')) statusClass = 'status-pending';
+                        if (e.status.toLowerCase().includes('inactive')) statusClass = 'status-overdue';
+
+                        // Permission Logic: Superadmin/Admin can edit anyone. Tara can edit herself.
+                        let canEdit = (userRole === 'admin' || userRole === 'superadmin') || (displayName === e.name);
+
+                        return `
+                        <tr>
+                            <td>${e.name}</td>
+                            <td>${e.role}</td>
+                            <td>${e.contact}</td>
+                            <td><span class="status-badge ${statusClass}">${e.status}</span></td>
+                            <td>${e.duty}</td>
+                            <td>
+                                ${canEdit ? `<button class="action-btn" style="padding: 5px 10px;" onclick="openEditEmployeeModal(${e.id}, '${e.contact.replace(/'/g, "\\'")}', '${e.status.replace(/'/g, "\\'")}', '${e.duty.replace(/'/g, "\\'")}')"><i class="fas fa-edit"></i></button>` : `<span style="color:#666; font-size:12px;">N/A</span>`}
+                            </td>
+                        </tr>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                console.error("Failed to fetch employees:", err);
+            }
+        }
+
+        function toggleEditEmployeeModal() {
+            const overlay = document.getElementById('editEmployeeOverlay');
+            overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function openEditEmployeeModal(id, contact, status, duty) {
+            document.getElementById('editEmpId').value = id;
+            document.getElementById('editEmpContact').value = contact;
+            document.getElementById('editEmpStatus').value = status;
+            document.getElementById('editEmpDuty').value = duty;
+            toggleEditEmployeeModal();
+        }
+
+        async function submitEditEmployee(e) {
+            e.preventDefault();
+            const id = document.getElementById('editEmpId').value;
+            const contact = document.getElementById('editEmpContact').value;
+            const status = document.getElementById('editEmpStatus').value;
+            const duty = document.getElementById('editEmpDuty').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/employees/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ contact, status, duty })
+                });
+
+                if (res.ok) {
+                    showToast('Employee updated successfully!', 'success');
+                    toggleEditEmployeeModal();
+                    fetchEmployees(); // Refresh list
+                } else {
+                    const data = await res.json();
+                    showToast(data.error || 'Failed to update employee.', 'error');
+                }
+            } catch (err) {
+                console.error("Employee update error:", err);
+            }
+        }
+
+        // ================= PAYMENTS/TRANSFERS LOGIC =================
+        async function fetchPayments() {
+            try {
+                const res = await fetch(`${API_BASE}/payments`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    const payments = await res.json();
+
+                    const listEl = document.getElementById('paymentsListContainer');
+                    if (payments.length === 0) {
+                        listEl.innerHTML = '<li><p style="color:#aaa;">No recent transactions.</p></li>';
+                        return;
+                    }
+
+                    // Check role for delete permission
+                    const token = localStorage.getItem('token');
+                    const payload = token ? JSON.parse(atob(token.split('.')[1])) : {};
+                    const isAdmin = payload.role === 'admin' || payload.role === 'superadmin';
+
+                    listEl.innerHTML = payments.map(p => {
+                        const isSent = p.type.toLowerCase() === 'sent';
+                        const iconClass = isSent ? 'warning' : 'success';
+                        const arrowClass = isSent ? 'fa-arrow-down' : 'fa-arrow-up';
+                        const symbol = isSent ? '-' : '+';
+                        const colorClass = isSent ? 'color:#dc3545;' : 'color:#28a745;';
+
+                        return `
+                        <li style="position:relative;">
+                            <div class="activity-icon ${iconClass}"><i class="fas ${arrowClass}"></i></div>
+                            <div class="activity-details">
+                                <h4 style="color:#fff;">${p.type} ${isSent ? 'to' : 'from'} ${p.entity}</h4>
+                                <p>${p.description} • ${p.date}</p>
+                                <span class="time" style="${colorClass} font-weight:bold; font-size:14px;">
+                                    ${symbol} Rs. ${p.amount.toLocaleString()}
+                                </span>
+                            </div>
+                            ${isAdmin ? `<i class="fas fa-trash" style="position:absolute; right:0; top:15px; color:#444; cursor:pointer;" onclick="deletePayment(${p.id})"></i>` : ''}
+                        </li>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                console.error("Failed to fetch payments:", err);
+            }
+        }
+
+        async function submitQuickTransfer(e) {
+            e.preventDefault();
+            const entity = document.getElementById('transferRecipient').value;
+            const amount = parseFloat(document.getElementById('transferAmount').value);
+
+            try {
+                const res = await fetch(`${API_BASE}/payments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ entity, amount })
+                });
+
+                if (res.ok) {
+                    showToast('Transfer initiated successfully!', 'success');
+                    document.getElementById('quickTransferForm').reset();
+                    fetchPayments(); // Refresh list
+                    fetchFunds(); // Money was spent
+                } else {
+                    const data = await res.json();
+                    showToast(data.error || 'Failed to initiate transfer.', 'error');
+                }
+            } catch (err) {
+                console.error("Transfer error:", err);
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        async function deletePayment(id) {
+            if (!confirm('Are you sure you want to delete this payment? This will refund the amount to company funds.')) return;
+            try {
+                const res = await fetch(`${API_BASE}/payments/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    showToast('Payment deleted and funds refunded.', 'success');
+                    fetchPayments();
+                    fetchFunds();
+                } else {
+                    const data = await res.json();
+                    showToast(data.error || 'Failed to delete payment.', 'error');
+                }
+            } catch (err) {
+                console.error("Delete payment error:", err);
+            }
+        }
+        // =======================================================
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const icons = { success: 'fa-check-circle', info: 'fa-info-circle', warning: 'fa-exclamation-triangle', error: 'fa-times-circle' };
+            const colors = { success: '#28a745', info: '#23a2f6', warning: '#f09819', error: '#dc3545' };
+            const toast = document.createElement('div');
+            toast.style.cssText = `background:rgba(8,7,22,0.95);border:1px solid ${colors[type]};border-left:4px solid ${colors[type]};color:#fff;padding:14px 20px;border-radius:12px;font-size:14px;display:flex;align-items:center;gap:12px;min-width:260px;backdrop-filter:blur(15px);box-shadow:0 8px 25px rgba(0,0,0,0.5);animation:slideInToast 0.4s ease forwards;`;
+            toast.innerHTML = `<i class="fas ${icons[type]}" style="color:${colors[type]};font-size:18px;"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideOutToast 0.4s ease forwards';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+
+        function toggleITPanel() {
+            const overlay = document.getElementById('itPanelOverlay');
+            const isOpen = overlay.style.display !== 'none';
+            overlay.style.display = isOpen ? 'none' : 'flex';
+            if (!isOpen) populateITPanel();
+        }
+
+        async function populateITPanel() {
+            const list = document.getElementById('itAccountsList');
+            list.innerHTML = '<p style="color:#aaa;">Loading...</p>';
+            const roleColors = { superadmin: '#9b59b6', admin: '#23a2f6', employee: '#28a745' };
+            const roleLabels = { superadmin: 'Super Admin', admin: 'Admin', employee: 'Employee' };
+
+            try {
+                const res = await fetch(`${API_BASE}/users`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (!res.ok) throw new Error('Failed to load users');
+                const users = await res.json();
+                list.innerHTML = '';
+
+                users.forEach(user => {
+                    const card = document.createElement('div');
+                    card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;';
+                    card.innerHTML = `
+                        <img src="https://ui-avatars.com/api/?name=${user.displayName}&background=1a1a2e&color=23a2f6" style="width:48px;height:48px;border-radius:50%;border:2px solid ${roleColors[user.role] || '#555'};">
+                        <div style="flex:1;">
+                            <div style="color:#fff;font-weight:600;font-size:15px;">${user.displayName} <span style="font-size:11px;background:${roleColors[user.role] || '#555'}33;color:${roleColors[user.role] || '#aaa'};padding:2px 8px;border-radius:20px;margin-left:8px;">${roleLabels[user.role] || user.role}</span></div>
+                            <div style="color:#aaa;font-size:12px;margin-top:2px;">@${user.username}</div>
+                        </div>
+                        <div style="display:flex;gap:10px;align-items:center;">
+                            <div class="input-group" style="margin:0;">
+                                <input type="password" id="pw_${user.username}" placeholder=" " autocomplete="off" style="padding:8px 14px;width:200px;">
+                                <label style="left:14px;">New Password</label>
+                            </div>
+                            <button class="action-btn" style="padding:8px 16px;height:40px;background:#23a2f6;color:#fff;border:none;font-weight:600;" onclick="changePassword('${user.username}', '${user.displayName}')">
+                                <i class="fas fa-key" style="color:#fff;"></i> Update
+                            </button>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            } catch (err) {
+                list.innerHTML = '<p style="color:#dc3545;">Failed to load accounts. Is the server running?</p>';
+            }
+        }
+
+        async function changePassword(username, displayName) {
+            const input = document.getElementById(`pw_${username}`);
+            const newPw = input.value.trim();
+            if (!newPw || newPw.length < 4) {
+                showToast('Password must be at least 4 characters.', 'warning');
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE}/users/${username}/password`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ newPassword: newPw })
+                });
+                if (!res.ok) throw new Error();
+                input.value = '';
+                showToast(`Password for ${displayName} updated successfully!`, 'success');
+            } catch {
+                showToast('Failed to update password.', 'error');
+            }
+        }
+
+
+        function toggleBills() {
+            const overlay = document.getElementById('billsOverlay');
+            overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+        }
+        function togglePayments() {
+            const overlay = document.getElementById('paymentsOverlay');
+            overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+        }
+        function toggleNotices() {
+            const overlay = document.getElementById('noticesOverlay');
+            overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+        }
+        function toggleEmployees() {
+            const overlay = document.getElementById('employeesOverlay');
+            overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+        }
+        function toggleMore() {
+            const overlay = document.getElementById('moreOverlay');
+            const isOpen = overlay.style.display !== 'none';
+            overlay.style.display = isOpen ? 'none' : 'flex';
+            if (!isOpen) {
+                // Reset delete button when opening
+                resetDeleteBtn();
+            }
+        }
+
+        let deleteClickCount = 0;
+        let deleteResetTimer = null;
+
+        function handleTripleDelete() {
+            const btn = document.getElementById('tripleDeleteBtn');
+            deleteClickCount++;
+
+            clearTimeout(deleteResetTimer);
+            deleteResetTimer = setTimeout(resetDeleteBtn, 5000); // Reset after 5 seconds of inactivity
+
+            if (deleteClickCount === 1) {
+                btn.style.background = '#f0981922';
+                btn.style.color = '#f09819';
+                btn.style.borderColor = '#f09819';
+                btn.innerHTML = '<i class="fas fa-question-circle" style="color:#f09819;"></i> Are you sure?';
+                showToast('Keep clicking to confirm deletion.', 'warning');
+            } else if (deleteClickCount === 2) {
+                btn.style.background = '#dc3545';
+                btn.style.color = '#fff';
+                btn.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#fff;"></i> Really? Last chance!';
+                showToast('ONE MORE CLICK to delete permanently!', 'error');
+            } else if (deleteClickCount === 3) {
+                executeQuickDelete();
+            }
+        }
+
+        function resetDeleteBtn() {
+            deleteClickCount = 0;
+            const btn = document.getElementById('tripleDeleteBtn');
+            if (btn) {
+                btn.style.background = '#dc354522';
+                btn.style.color = '#dc3545';
+                btn.style.borderColor = '#dc3545';
+                btn.innerHTML = '<i class="fas fa-user-slash" style="color:#dc3545;"></i> Delete My Account';
+            }
+        }
+
+        async function executeQuickDelete() {
+            const btn = document.getElementById('tripleDeleteBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="color:#fff;"></i> Deleting...';
+
+            try {
+                const res = await fetch(`${API_BASE}/users/me/triple-click-delete`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (res.ok) {
+                    showToast('Account deleted. Redirecting...', 'success');
+                    setTimeout(() => {
+                        localStorage.clear();
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    const data = await res.json();
+                    throw new Error(data.error || 'Deletion failed');
+                }
+            } catch (err) {
+                showToast(err.message || 'Failed to delete account.', 'error');
+                resetDeleteBtn();
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>
