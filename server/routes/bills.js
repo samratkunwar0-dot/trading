@@ -78,8 +78,8 @@ router.put('/:id/status', requireAuth, async (req, res) => {
 
         res.json({ success: true, message: `Bill ${id} status updated to ${status}.` });
     } catch (error) {
-        console.error('Update bill status error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error(`Update bill status error (ID: ${id}, status: ${status}):`, error);
+        res.status(500).json({ error: 'Internal server error while updating bill status.' });
     }
 });
 

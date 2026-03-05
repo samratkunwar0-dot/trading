@@ -108,8 +108,8 @@
                     <div class="actions-grid">
                         <button class="action-btn" onclick="toggleNewBillModal()"><i class="fas fa-plus"></i> New
                             Bill</button>
-                        <button class="action-btn" onclick="showToast('Opening payment form...', 'info')"><i
-                                class="fas fa-money-check-alt"></i> Make Payment</button>
+                        <button class="action-btn" onclick="togglePayments()"><i class="fas fa-money-check-alt"></i>
+                            Make Payment</button>
                         <button class="action-btn admin-only" onclick="toggleNewNoticeModal()"><i
                                 class="fas fa-bullhorn"></i> Post Notice</button>
                     </div>
@@ -127,318 +127,337 @@
             </div> <!-- End of grid-container -->
 
 
-                <div class="map-overlay" id="billsOverlay" style="display: none;">
-                    <div class="map-header">
-                        <h3><i class="fas fa-file-invoice-dollar"></i> Recent Bills & Invoices</h3>
-                        <button class="close-map-btn" onclick="toggleBills()"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="bills-container">
-                        <table class="bills-table">
-                            <thead>
-                                <tr>
-                                    <th>Invoice #</th>
-                                    <th>Client / Vendor</th>
-                                    <th>Date</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="billsTableBody">
-                                <tr>
-                                    <td colspan="5" style="text-align: center; color: #aaa;">Loading bills...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="map-overlay" id="billsOverlay" style="display: none;">
+                <div class="map-header">
+                    <h3><i class="fas fa-file-invoice-dollar"></i> Recent Bills & Invoices</h3>
+                    <button class="close-map-btn" onclick="toggleBills()"><i class="fas fa-times"></i></button>
                 </div>
+                <div class="bills-container">
+                    <table class="bills-table">
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Client / Vendor</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="billsTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: #aaa;">Loading bills...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
 
-                <div class="map-overlay" id="paymentsOverlay" style="display: none;">
-                    <div class="map-header">
-                        <h3><i class="fas fa-credit-card"></i> Payments & Transfers</h3>
-                        <button class="close-map-btn" onclick="togglePayments()"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="payments-container bills-container">
-                        <div class="payments-split">
-                            <div class="recent-transactions">
-                                <h4>Recent Transactions</h4>
-                                <ul class="activity-list" style="margin-top: 15px;" id="paymentsListContainer">
-                                    <li>
-                                        <p style="color:#aaa;">Loading payments...</p>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="quick-transfer">
-                                <h4>Quick Transfer</h4>
-                                <form class="transfer-form" id="quickTransferForm"
-                                    onsubmit="submitQuickTransfer(event)">
-                                    <div class="input-group" style="margin-bottom: 15px; margin-top: 15px;">
-                                        <input type="text" id="transferRecipient" required placeholder=" "
-                                            autocomplete="off" style="padding: 10px 15px;">
-                                        <label style="left: 15px;">Recipient Account / Name</label>
-                                    </div>
-                                    <div class="input-group" style="margin-bottom: 25px;">
-                                        <input type="number" id="transferAmount" step="0.01" required placeholder=" "
-                                            autocomplete="off" style="padding: 10px 15px;">
-                                        <label style="left: 15px;">Amount (Rs.)</label>
-                                    </div>
-                                    <button class="action-btn" type="submit"
-                                        style="width:100%; justify-content:center; background:#23a2f6; color:#fff; border:none; font-weight:600;">
-                                        <i class="fas fa-paper-plane" style="color:#fff;"></i> Send Payment
-                                    </button>
-                                </form>
-                            </div>
+            <div class="map-overlay" id="paymentsOverlay" style="display: none;">
+                <div class="map-header">
+                    <h3><i class="fas fa-credit-card"></i> Payments & Transfers</h3>
+                    <button class="close-map-btn" onclick="togglePayments()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="payments-container bills-container">
+                    <div class="payments-split">
+                        <div class="recent-transactions">
+                            <h4>Recent Transactions</h4>
+                            <ul class="activity-list" style="margin-top: 15px;" id="paymentsListContainer">
+                                <li>
+                                    <p style="color:#aaa;">Loading payments...</p>
+                                </li>
+                            </ul>
                         </div>
-                    </div>
-                </div>
-
-
-                <div class="map-overlay" id="noticesOverlay" style="display: none;">
-                    <div class="map-header">
-                        <h3><i class="fas fa-bell"></i> Official Notices</h3>
-                        <button class="close-map-btn" onclick="toggleNotices()"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="bills-container notices-grid" id="allNoticesGrid">
-                        <p style="color:#aaa;">Loading notices...</p>
-                    </div>
-                </div>
-
-
-                <div class="map-overlay" id="employeesOverlay" style="display: none;">
-                    <div class="map-header">
-                        <h3><i class="fas fa-users"></i> Employee Database</h3>
-                        <div style="display: flex; gap: 15px;">
-                            <button class="close-map-btn" onclick="toggleEmployees()"><i
-                                    class="fas fa-times"></i></button>
-                        </div>
-                    </div>
-                    <div class="bills-container">
-                        <table class="bills-table">
-                            <thead>
-                                <tr>
-                                    <th>Employee Name</th>
-                                    <th>Role / Title</th>
-                                    <th>Contact</th>
-                                    <th>Status</th>
-                                    <th>Current Duty/Task</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="employeesTableBody">
-                                <tr>
-                                    <td colspan="6" style="text-align: center; color: #aaa;">Loading employees...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-
-                <div class="map-overlay admin-only" id="moreOverlay" style="display: none;">
-                    <div class="map-header">
-                        <h3><i class="fas fa-cogs"></i> System Settings & More</h3>
-                        <button class="close-map-btn" onclick="toggleMore()"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="bills-container">
-                        <div class="payments-split">
-                            <div class="recent-transactions">
-                                <h4>Company Profile</h4>
-                                <form class="transfer-form" style="margin-top:20px;">
-                                    <div class="input-group" style="margin-bottom: 20px;">
-                                        <input type="text" value="M & G Traders" placeholder=" " autocomplete="off"
-                                            style="padding: 10px 15px;">
-                                        <label style="left: 15px; top: -10px; background: rgba(8, 7, 16, 0.9);">Company
-                                            Name</label>
-                                    </div>
-                                    <div class="input-group" style="margin-bottom: 20px;">
-                                        <input type="text" value="Kathmandu, Nepal" placeholder=" " autocomplete="off"
-                                            style="padding: 10px 15px;">
-                                        <label style="left: 15px; top: -10px; background: rgba(8, 7, 16, 0.9);">Main
-                                            Office Address</label>
-                                    </div>
-                                    <div class="input-group" style="margin-bottom: 20px;">
-                                        <input type="email" value="contact@mgtraders.com" placeholder=" "
-                                            autocomplete="off" style="padding: 10px 15px;">
-                                        <label style="left: 15px; top: -10px; background: rgba(8, 7, 16, 0.9);">Admin
-                                            Email</label>
-                                    </div>
-                                    <button class="action-btn" type="button"
-                                        style="background:#28a745; color:#fff; border:none;">
-                                        <i class="fas fa-save" style="color:#fff;"></i> Save Changes
-                                    </button>
-                                </form>
-                            </div>
-                            <div class="quick-transfer">
-                                <h4>System Preferences</h4>
-                                <ul class="activity-list" style="margin-top: 15px;">
-                                    <li
-                                        style="justify-content: space-between; align-items: center; border-bottom: none;">
-                                        <div class="activity-details">
-                                            <h4 style="color:#fff;">Two-Factor Authentication</h4>
-                                            <p>Require 2FA for all admin logins.</p>
-                                        </div>
-                                        <label class="remember-me">
-                                            <input type="checkbox" checked>
-                                        </label>
-                                    </li>
-                                    <li
-                                        style="justify-content: space-between; align-items: center; border-bottom: none;">
-                                        <div class="activity-details">
-                                            <h4 style="color:#fff;">Email Notifications</h4>
-                                            <p>Receive daily summary reports.</p>
-                                        </div>
-                                        <label class="remember-me">
-                                            <input type="checkbox" checked>
-                                        </label>
-                                    </li>
-                                    <li
-                                        style="justify-content: space-between; align-items: center; border-bottom: none;">
-                                        <div class="activity-details">
-                                            <h4 style="color:#fff;">Dark Mode Dashboard</h4>
-                                            <p>Use the sleek dark theme.</p>
-                                        </div>
-                                        <label class="remember-me">
-                                            <input type="checkbox" checked disabled>
-                                        </label>
-                                    </li>
-                                </ul>
-                                <div class="danger-zone"
-                                    style="margin-top: 30px; padding: 20px; border: 1px dashed #dc3545; border-radius: 12px; background: rgba(220, 53, 69, 0.05);">
-                                    <h4 style="color: #dc3545; margin-bottom: 5px;"><i
-                                            class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
-                                    <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Deleting your account
-                                        is permanent and cannot be undone.</p>
-                                    <button id="tripleDeleteBtn" class="action-btn"
-                                        style="width: 100%; justify-content: center; background: #dc354522; color: #dc3545; border: 1px solid #dc3545; font-weight: 600; transition: all 0.3s ease;"
-                                        onclick="handleTripleDelete()">
-                                        <i class="fas fa-user-slash" style="color: #dc3545;"></i> Delete My Account
-                                    </button>
+                        <div class="quick-transfer">
+                            <h4>Quick Transfer</h4>
+                            <form class="transfer-form" id="quickTransferForm" onsubmit="submitQuickTransfer(event)">
+                                <div class="input-group" style="margin-bottom: 15px; margin-top: 15px;">
+                                    <input type="text" id="transferRecipient" required placeholder=" "
+                                        autocomplete="off" style="padding: 10px 15px;">
+                                    <label style="left: 15px;">Recipient Account / Name</label>
                                 </div>
+                                <div class="input-group" style="margin-bottom: 25px;">
+                                    <input type="number" id="transferAmount" step="0.01" required placeholder=" "
+                                        autocomplete="off" style="padding: 10px 15px;">
+                                    <label style="left: 15px;">Amount (Rs.)</label>
+                                </div>
+                                <button class="action-btn" type="submit"
+                                    style="width:100%; justify-content:center; background:#23a2f6; color:#fff; border:none; font-weight:600;">
+                                    <i class="fas fa-paper-plane" style="color:#fff;"></i> Send Payment
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="map-overlay" id="noticesOverlay" style="display: none;">
+                <div class="map-header">
+                    <h3><i class="fas fa-bell"></i> Official Notices</h3>
+                    <button class="close-map-btn" onclick="toggleNotices()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="bills-container notices-grid" id="allNoticesGrid">
+                    <p style="color:#aaa;">Loading notices...</p>
+                </div>
+            </div>
+
+
+            <div class="map-overlay" id="employeesOverlay" style="display: none;">
+                <div class="map-header">
+                    <h3><i class="fas fa-users"></i> Employee Database</h3>
+                    <div style="display: flex; gap: 15px;">
+                        <button class="close-map-btn" onclick="toggleEmployees()"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="bills-container">
+                    <table class="bills-table">
+                        <thead>
+                            <tr>
+                                <th>Employee Name</th>
+                                <th>Role / Title</th>
+                                <th>Contact</th>
+                                <th>Status</th>
+                                <th>Current Duty/Task</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeesTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: #aaa;">Loading employees...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="map-overlay admin-only" id="moreOverlay" style="display: none;">
+                <div class="map-header">
+                    <h3><i class="fas fa-cogs"></i> System Settings & More</h3>
+                    <button class="close-map-btn" onclick="toggleMore()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="bills-container">
+                    <div class="payments-split">
+                        <div class="recent-transactions">
+                            <h4>Company Profile</h4>
+                            <form class="transfer-form" style="margin-top:20px;">
+                                <div class="input-group" style="margin-bottom: 20px;">
+                                    <input type="text" value="M & G Traders" placeholder=" " autocomplete="off"
+                                        style="padding: 10px 15px;">
+                                    <label style="left: 15px; top: -10px; background: rgba(8, 7, 16, 0.9);">Company
+                                        Name</label>
+                                </div>
+                                <div class="input-group" style="margin-bottom: 20px;">
+                                    <input type="text" value="Kathmandu, Nepal" placeholder=" " autocomplete="off"
+                                        style="padding: 10px 15px;">
+                                    <label style="left: 15px; top: -10px; background: rgba(8, 7, 16, 0.9);">Main
+                                        Office Address</label>
+                                </div>
+                                <div class="input-group" style="margin-bottom: 20px;">
+                                    <input type="email" value="contact@mgtraders.com" placeholder=" " autocomplete="off"
+                                        style="padding: 10px 15px;">
+                                    <label style="left: 15px; top: -10px; background: rgba(8, 7, 16, 0.9);">Admin
+                                        Email</label>
+                                </div>
+                                <button class="action-btn" type="button"
+                                    style="background:#28a745; color:#fff; border:none;">
+                                    <i class="fas fa-save" style="color:#fff;"></i> Save Changes
+                                </button>
+                            </form>
+                        </div>
+                        <div class="quick-transfer">
+                            <h4>System Preferences</h4>
+                            <ul class="activity-list" style="margin-top: 15px;">
+                                <li style="justify-content: space-between; align-items: center; border-bottom: none;">
+                                    <div class="activity-details">
+                                        <h4 style="color:#fff;">Two-Factor Authentication</h4>
+                                        <p>Require 2FA for all admin logins.</p>
+                                    </div>
+                                    <label class="remember-me">
+                                        <input type="checkbox" checked>
+                                    </label>
+                                </li>
+                                <li style="justify-content: space-between; align-items: center; border-bottom: none;">
+                                    <div class="activity-details">
+                                        <h4 style="color:#fff;">Email Notifications</h4>
+                                        <p>Receive daily summary reports.</p>
+                                    </div>
+                                    <label class="remember-me">
+                                        <input type="checkbox" checked>
+                                    </label>
+                                </li>
+                                <li style="justify-content: space-between; align-items: center; border-bottom: none;">
+                                    <div class="activity-details">
+                                        <h4 style="color:#fff;">Dark Mode Dashboard</h4>
+                                        <p>Use the sleek dark theme.</p>
+                                    </div>
+                                    <label class="remember-me">
+                                        <input type="checkbox" checked disabled>
+                                    </label>
+                                </li>
+                            </ul>
+                            <div class="danger-zone"
+                                style="margin-top: 30px; padding: 20px; border: 1px dashed #dc3545; border-radius: 12px; background: rgba(220, 53, 69, 0.05);">
+                                <h4 style="color: #dc3545; margin-bottom: 5px;"><i
+                                        class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
+                                <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Deleting your account
+                                    is permanent and cannot be undone.</p>
+                                <button id="tripleDeleteBtn" class="action-btn"
+                                    style="width: 100%; justify-content: center; background: #dc354522; color: #dc3545; border: 1px solid #dc3545; font-weight: 600; transition: all 0.3s ease;"
+                                    onclick="handleTripleDelete()">
+                                    <i class="fas fa-user-slash" style="color: #dc3545;"></i> Delete My Account
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
 
 
 
 
-                <div class="map-overlay" id="newBillOverlay"
-                    style="display: none; align-items: center; justify-content: center;">
+            <div class="map-overlay" id="newBillOverlay"
+                style="display: none; align-items: center; justify-content: center;">
+                <div
+                    style="background: rgba(8, 7, 22, 0.95); padding: 30px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); width: 400px; max-width: 90%;">
                     <div
-                        style="background: rgba(8, 7, 22, 0.95); padding: 30px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); width: 400px; max-width: 90%;">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="color: #fff;"><i class="fas fa-plus-circle"></i> Create New Bill</h3>
-                            <button class="close-map-btn" onclick="toggleNewBillModal()" style="position: static;"><i
-                                    class="fas fa-times"></i></button>
-                        </div>
-                        <form id="newBillForm" onsubmit="submitNewBill(event)">
-                            <div class="input-group" style="margin-bottom: 20px;">
-                                <input type="text" id="billClientName" required placeholder=" "
-                                    style="padding: 10px 15px;">
-                                <label style="left: 15px; top: -10px; background: #080716;">Client Name</label>
-                            </div>
-                            <div class="input-group" style="margin-bottom: 20px;">
-                                <input type="date" id="billDate" required
-                                    style="padding: 10px 15px; color-scheme: dark;">
-                                <label style="left: 15px; top: -10px; background: #080716;">Date</label>
-                            </div>
-                            <div class="input-group" style="margin-bottom: 20px;">
-                                <input type="number" step="0.01" id="billAmount" required placeholder=" "
-                                    style="padding: 10px 15px;">
-                                <label style="left: 15px; top: -10px; background: #080716;">Amount (Rs.)</label>
-                            </div>
-                            <div class="input-group" style="margin-bottom: 20px;">
-                                <select id="billStatus" required
-                                    style="padding: 10px 15px; width: 100%; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 8px;">
-                                    <option value="Pending" style="background:#080716;">Pending</option>
-                                    <option value="Paid" style="background:#080716;">Paid</option>
-                                </select>
-                                <label style="left: 15px; top: -10px; background: #080716;">Status</label>
-                            </div>
-                            <button class="action-btn" type="submit"
-                                style="width: 100%; justify-content: center; background: #23a2f6; color: #fff; border: none;">Save
-                                Bill</button>
-                        </form>
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="color: #fff;"><i class="fas fa-plus-circle"></i> Create New Bill</h3>
+                        <button class="close-map-btn" onclick="toggleNewBillModal()" style="position: static;"><i
+                                class="fas fa-times"></i></button>
                     </div>
+                    <form id="newBillForm" onsubmit="submitNewBill(event)">
+                        <div class="input-group" style="margin-bottom: 20px;">
+                            <input type="text" id="billClientName" required placeholder=" " style="padding: 10px 15px;">
+                            <label style="left: 15px; top: -10px; background: #080716;">Client Name</label>
+                        </div>
+                        <div class="input-group" style="margin-bottom: 20px;">
+                            <input type="date" id="billDate" required style="padding: 10px 15px; color-scheme: dark;">
+                            <label style="left: 15px; top: -10px; background: #080716;">Date</label>
+                        </div>
+                        <div class="input-group" style="margin-bottom: 20px;">
+                            <input type="number" step="0.01" id="billAmount" required placeholder=" "
+                                style="padding: 10px 15px;">
+                            <label style="left: 15px; top: -10px; background: #080716;">Amount (Rs.)</label>
+                        </div>
+                        <div class="input-group" style="margin-bottom: 20px;">
+                            <select id="billStatus" required
+                                style="padding: 10px 15px; width: 100%; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 8px;">
+                                <option value="Pending" style="background:#080716;">Pending</option>
+                                <option value="Paid" style="background:#080716;">Paid</option>
+                            </select>
+                            <label style="left: 15px; top: -10px; background: #080716;">Status</label>
+                        </div>
+                        <button class="action-btn" type="submit"
+                            style="width: 100%; justify-content: center; background: #23a2f6; color: #fff; border: none;">Save
+                            Bill</button>
+                    </form>
                 </div>
+            </div>
 
-                <div class="map-overlay admin-only" id="newNoticeOverlay"
-                    style="display: none; align-items: center; justify-content: center;">
+            <div class="map-overlay admin-only" id="editNoticeOverlay"
+                style="display: none; align-items: center; justify-content: center;">
+                <div
+                    style="background: rgba(8, 7, 22, 0.95); padding: 30px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); width: 400px; max-width: 90%;">
                     <div
-                        style="background: rgba(8, 7, 22, 0.95); padding: 30px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); width: 400px; max-width: 90%;">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="color: #fff;"><i class="fas fa-bullhorn"></i> Post Notice</h3>
-                            <button class="close-map-btn" onclick="toggleNewNoticeModal()" style="position: static;"><i
-                                    class="fas fa-times"></i></button>
-                        </div>
-                        <form id="newNoticeForm" onsubmit="submitNewNotice(event)">
-                            <div class="input-group" style="margin-bottom: 20px;">
-                                <input type="text" id="noticeTitle" required placeholder=" "
-                                    style="padding: 10px 15px;">
-                                <label style="left: 15px; top: -10px; background: #080716;">Notice Title</label>
-                            </div>
-                            <div class="input-group" style="margin-bottom: 20px;">
-                                <textarea id="noticeContent" required placeholder=" "
-                                    style="padding: 10px 15px; width: 100%; height: 100px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 8px; font-family: inherit; resize: none;"></textarea>
-                                <label style="left: 15px; top: -10px; background: #080716;">Content</label>
-                            </div>
-                            <button class="action-btn" type="submit"
-                                style="width: 100%; justify-content: center; background: #f09819; color: #fff; border: none;">Post
-                                Notice</button>
-                        </form>
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="color: #fff;"><i class="fas fa-edit"></i> Edit Notice</h3>
+                        <button class="close-map-btn" onclick="toggleEditNoticeModal()" style="position: static;"><i
+                                class="fas fa-times"></i></button>
                     </div>
+                    <form id="editNoticeForm" onsubmit="submitEditNotice(event)">
+                        <input type="hidden" id="editNoticeId">
+                        <div class="input-group" style="margin-bottom: 20px;">
+                            <input type="text" id="editNoticeTitle" required placeholder=" "
+                                style="padding: 10px 15px;">
+                            <label style="left: 15px; top: -10px; background: #080716;">Notice Title</label>
+                        </div>
+                        <div class="input-group" style="margin-bottom: 20px;">
+                            <textarea id="editNoticeContent" required placeholder=" "
+                                style="padding: 10px 15px; width: 100%; height: 100px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 8px; font-family: inherit; resize: none;"></textarea>
+                            <label style="left: 15px; top: -10px; background: #080716;">Content</label>
+                        </div>
+                        <button class="action-btn" type="submit"
+                            style="width: 100%; justify-content: center; background: #23a2f6; color: #fff; border: none;">Update
+                            Notice</button>
+                    </form>
                 </div>
+            </div>
 
-                <div class="map-overlay" id="editEmployeeOverlay"
-                    style="display: none; align-items: center; justify-content: center;">
+            <div class="map-overlay admin-only" id="newNoticeOverlay"
+                style="display: none; align-items: center; justify-content: center;">
+                <div
+                    style="background: rgba(8, 7, 22, 0.95); padding: 30px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); width: 400px; max-width: 90%;">
                     <div
-                        style="background: rgba(8, 7, 22, 0.95); padding: 30px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); width: 400px; max-width: 90%;">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="color: #fff;"><i class="fas fa-user-edit"></i> Edit Tasks/Details</h3>
-                            <button class="close-map-btn" onclick="toggleEditEmployeeModal()"
-                                style="position: static;"><i class="fas fa-times"></i></button>
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="color: #fff;"><i class="fas fa-bullhorn"></i> Post Notice</h3>
+                        <button class="close-map-btn" onclick="toggleNewNoticeModal()" style="position: static;"><i
+                                class="fas fa-times"></i></button>
+                    </div>
+                    <form id="newNoticeForm" onsubmit="submitNewNotice(event)">
+                        <div class="input-group" style="margin-bottom: 20px;">
+                            <input type="text" id="noticeTitle" required placeholder=" " style="padding: 10px 15px;">
+                            <label style="left: 15px; top: -10px; background: #080716;">Notice Title</label>
                         </div>
-                        <form id="editEmployeeForm" onsubmit="submitEditEmployee(event)">
-                            <input type="hidden" id="editEmpId">
-                            <div class="input-group" style="margin-bottom: 20px;">
-                                <input type="text" id="editEmpContact" required placeholder=" "
-                                    style="padding: 10px 15px;">
-                                <label style="left: 15px; top: -10px; background: #080716;">Contact Info</label>
-                            </div>
-                            <div class="input-group" style="margin-bottom: 20px;">
-                                <input type="text" id="editEmpStatus" required placeholder=" "
-                                    style="padding: 10px 15px;">
-                                <label style="left: 15px; top: -10px; background: #080716;">Status (e.g., Active - In
-                                    Office)</label>
-                            </div>
-                            <div class="input-group" style="margin-bottom: 20px;">
-                                <textarea id="editEmpDuty" required placeholder=" "
-                                    style="padding: 10px 15px; width: 100%; min-height: 100px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; resize: vertical;"></textarea>
-                                <label style="left: 15px; top: -10px; background: #080716;">Current Duty/Task
-                                    (Detailed)</label>
-                            </div>
-                            <button class="action-btn" type="submit"
-                                style="width: 100%; justify-content: center; background: #28a745; color: #fff; border: none;">Save
-                                Changes</button>
-                        </form>
-                    </div>
+                        <div class="input-group" style="margin-bottom: 20px;">
+                            <textarea id="noticeContent" required placeholder=" "
+                                style="padding: 10px 15px; width: 100%; height: 100px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 8px; font-family: inherit; resize: none;"></textarea>
+                            <label style="left: 15px; top: -10px; background: #080716;">Content</label>
+                        </div>
+                        <button class="action-btn" type="submit"
+                            style="width: 100%; justify-content: center; background: #f09819; color: #fff; border: none;">Post
+                            Notice</button>
+                    </form>
                 </div>
+            </div>
 
-                <div class="map-overlay superadmin-only" id="itPanelOverlay" style="display:none;">
-                    <div class="map-header">
-                        <h3><i class="fas fa-shield-alt"></i> IT Admin Panel — Account Management</h3>
-                        <button class="close-map-btn" onclick="toggleITPanel()"><i class="fas fa-times"></i></button>
+            <div class="map-overlay" id="editEmployeeOverlay"
+                style="display: none; align-items: center; justify-content: center;">
+                <div
+                    style="background: rgba(8, 7, 22, 0.95); padding: 30px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); width: 400px; max-width: 90%;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="color: #fff;"><i class="fas fa-user-edit"></i> Edit Tasks/Details</h3>
+                        <button class="close-map-btn" onclick="toggleEditEmployeeModal()" style="position: static;"><i
+                                class="fas fa-times"></i></button>
                     </div>
-                    <div class="bills-container">
-                        <p style="color:#aaa;font-size:13px;margin-bottom:20px;">As IT Admin, you can update any
-                            account's password. Changes are saved immediately.</p>
-                        <div id="itAccountsList" style="display:flex;flex-direction:column;gap:15px;"></div>
-                    </div>
+                    <form id="editEmployeeForm" onsubmit="submitEditEmployee(event)">
+                        <input type="hidden" id="editEmpId">
+                        <div class="input-group" style="margin-bottom: 20px;">
+                            <input type="text" id="editEmpContact" required placeholder=" " style="padding: 10px 15px;">
+                            <label style="left: 15px; top: -10px; background: #080716;">Contact Info</label>
+                        </div>
+                        <div class="input-group" style="margin-bottom: 20px;">
+                            <input type="text" id="editEmpStatus" required placeholder=" " style="padding: 10px 15px;">
+                            <label style="left: 15px; top: -10px; background: #080716;">Status (e.g., Active - In
+                                Office)</label>
+                        </div>
+                        <div class="input-group" style="margin-bottom: 20px;">
+                            <textarea id="editEmpDuty" required placeholder=" "
+                                style="padding: 10px 15px; width: 100%; min-height: 100px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; resize: vertical;"></textarea>
+                            <label style="left: 15px; top: -10px; background: #080716;">Current Duty/Task
+                                (Detailed)</label>
+                        </div>
+                        <button class="action-btn" type="submit"
+                            style="width: 100%; justify-content: center; background: #28a745; color: #fff; border: none;">Save
+                            Changes</button>
+                    </form>
                 </div>
+            </div>
+
+            <div class="map-overlay superadmin-only" id="itPanelOverlay" style="display:none;">
+                <div class="map-header">
+                    <h3><i class="fas fa-shield-alt"></i> IT Admin Panel — Account Management</h3>
+                    <button class="close-map-btn" onclick="toggleITPanel()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="bills-container">
+                    <p style="color:#aaa;font-size:13px;margin-bottom:20px;">As IT Admin, you can update any
+                        account's password. Changes are saved immediately.</p>
+                    <div id="itAccountsList" style="display:flex;flex-direction:column;gap:15px;"></div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -606,9 +625,13 @@
                     showToast(`Bill marked as ${newStatus}`, 'success');
                     fetchBills();
                     fetchFunds(); // Money earned might have changed
+                } else {
+                    const data = await res.json();
+                    showToast(data.error || 'Failed to update bill status.', 'error');
                 }
             } catch (err) {
                 console.error("Failed to update bill status:", err);
+                showToast('Network error while updating bill status.', 'error');
             }
         }
 
@@ -661,10 +684,12 @@
                     fetchBills();
                     fetchFunds();
                 } else {
-                    showToast('Failed to create bill.', 'error');
+                    const data = await res.json();
+                    showToast(data.error || 'Failed to create bill.', 'error');
                 }
             } catch (err) {
                 console.error("Bill creation error:", err);
+                showToast('Network error while creating bill.', 'error');
             }
         }
 
@@ -707,11 +732,21 @@
 
                     // Populate Grid
                     gridEl.innerHTML = notices.map(n => `
-                        <div class="notice-card info-notice">
+                        <div class="notice-card info-notice" style="position:relative;">
                             <span class="notice-date">${n.date}</span>
                             <h4><i class="fas fa-info-circle"></i> ${n.title}</h4>
                             <p>${n.content}</p>
                             <span class="notice-author">By: ${n.author}</span>
+                            ${isAdmin ? `
+                                <div style="position:absolute; bottom:15px; right:15px; display:flex; gap:8px;">
+                                    <button class="action-btn" style="padding: 5px 8px; font-size:12px; border-radius:6px; background:rgba(35,162,246,0.1); color:#23a2f6;" onclick="openEditNoticeModal(${n.id}, '${n.title.replace(/'/g, "\\'")}', '${n.content.replace(/'/g, "\\'")}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn" style="padding: 5px 8px; font-size:12px; border-radius:6px; background:rgba(220,53,69,0.1); color:#dc3545;" onclick="deleteNotice(${n.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
                         </div>
                     `).join('');
                 }
@@ -752,6 +787,70 @@
                 }
             } catch (err) {
                 console.error("Notice creation error:", err);
+                showToast('Network error while posting notice.', 'error');
+            }
+        }
+
+        function toggleEditNoticeModal() {
+            const overlay = document.getElementById('editNoticeOverlay');
+            overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+            refreshDashboardVisibility();
+        }
+
+        function openEditNoticeModal(id, title, content) {
+            document.getElementById('editNoticeId').value = id;
+            document.getElementById('editNoticeTitle').value = title;
+            document.getElementById('editNoticeContent').value = content;
+            toggleEditNoticeModal();
+        }
+
+        async function submitEditNotice(e) {
+            e.preventDefault();
+            const id = document.getElementById('editNoticeId').value;
+            const title = document.getElementById('editNoticeTitle').value;
+            const content = document.getElementById('editNoticeContent').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/notices/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ title, content })
+                });
+
+                if (res.ok) {
+                    showToast('Notice updated successfully!', 'success');
+                    toggleEditNoticeModal();
+                    fetchNotices();
+                } else {
+                    const data = await res.json();
+                    showToast(data.error || 'Failed to update notice.', 'error');
+                }
+            } catch (err) {
+                console.error("Notice update error:", err);
+                showToast('Network error while updating notice.', 'error');
+            }
+        }
+
+        async function deleteNotice(id) {
+            if (!confirm('Are you sure you want to delete this notice?')) return;
+            try {
+                const res = await fetch(`${API_BASE}/notices/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    showToast('Notice deleted successfully.', 'success');
+                    fetchNotices();
+                } else {
+                    const data = await res.json();
+                    showToast(data.error || 'Failed to delete notice.', 'error');
+                }
+            } catch (err) {
+                console.error("Notice deletion error:", err);
+                showToast('Network error while deleting notice.', 'error');
             }
         }
 
