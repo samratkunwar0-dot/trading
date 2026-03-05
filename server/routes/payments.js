@@ -20,8 +20,8 @@ router.get('/', requireAuth, async (req, res) => {
 router.post('/', requireAuth, async (req, res) => {
     const { entity, amount } = req.body;
 
-    if (!entity || !amount) {
-        return res.status(400).json({ error: 'Entity and amount are required.' });
+    if (!entity || !amount || amount <= 0) {
+        return res.status(400).json({ error: 'Valid entity and positive amount are required.' });
     }
 
     try {
