@@ -1,0 +1,22 @@
+{
+  "samrat": {
+    "displayName": "Samrat",
+    "passwordHash": "$2a$10$.K43nCFKHuIfXhuBINFD2u8W.th4BSNiJ3dUQpmiIkx7EoSb5yxUi",
+    "role": "superadmin"
+  },
+  "mandira": {
+    "displayName": "Mandira",
+    "passwordHash": "$2a$10$fAvvsPxv63ck6.FqP8ttUOso4Urr//yLzI/Zw4y7BNY3sT4MiITuC",
+    "role": "admin"
+  },
+  "ganesh": {
+    "displayName": "Ganesh",
+    "passwordHash": "$2a$10$ZIQEQRjkEtg1gYyDq10qkeTeekDKgl83r6DGtFKlg3ku52i5YM/3O",
+    "role": "admin"
+  },
+  "tara": {
+    "displayName": "Tara",
+    "passwordHash": "$2a$10$Odinvye4yNzoQK/xdCau7OPViIsgoyMM.PcGiyPMaB4AcWbAZxYHa",
+    "role": "employee"
+  }
+}
